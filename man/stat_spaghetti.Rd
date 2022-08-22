@@ -19,17 +19,83 @@ stat_spaghetti(
   ...
 )
 }
+\arguments{
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}} or
+\code{\link[ggplot2:aes_]{aes_()}}. If specified and \code{inherit.aes = TRUE} (the
+default), it is combined with the default mapping at the top level of the
+plot. You must supply \code{mapping} if there is no plot mapping.}
+
+\item{data}{The data to be displayed in this layer. There are three
+options:
+
+If \code{NULL}, the default, the data is inherited from the plot
+data as specified in the call to \code{\link[ggplot2:ggplot]{ggplot()}}.
+
+A \code{data.frame}, or other object, will override the plot
+data. All objects will be fortified to produce a data frame. See
+\code{\link[ggplot2:fortify]{fortify()}} for which variables will be created.
+
+A \code{function} will be called with a single argument,
+the plot data. The return value must be a \code{data.frame}, and
+will be used as the layer data. A \code{function} can be created
+from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
+
+\item{geom}{The geometric object to use display the data}
+
+\item{position}{Position adjustment, either as a string, or the result of
+a call to a position adjustment function.}
+
+\item{na.rm}{should \code{NA} values be removed?}
+
+\item{show.legend}{logical. Should this layer be included in the legends?
+\code{NA}, the default, includes if any aesthetics are mapped.
+\code{FALSE} never includes, and \code{TRUE} always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.}
+
+\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+
+\item{max.lines}{the maximum number of samples to display}
+
+\item{alpha.sample}{the alpha value for sample lines}
+
+\item{alpha.central}{the alpha value for the central indicator}
+
+\item{central.fun}{the function for computing the central indicator}
+
+\item{...}{
+  Arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer}}
+  \describe{
+    \item{\code{stat}}{The statistical transformation to use on the data for this
+layer, as a string.}
+    \item{\code{params}}{Additional parameters to the \code{geom} and \code{stat}.}
+    \item{\code{check.aes,check.param}}{If \code{TRUE}, the default, will check that
+supplied parameters and aesthetics are understood by the \code{geom} or
+\code{stat}. Use \code{FALSE} to suppress the checks.}
+    \item{\code{key_glyph}}{A legend key drawing function or a string providing the
+function name minus the \code{draw_key_} prefix. See \link[ggplot2]{draw_key} for details.}
+    \item{\code{layer_class}}{The type of layer object to be constructued. This is
+intended for ggplot2 internal use only.}
+  }}
+}
 \description{
 \code{stat_spaghetti()} extends observation groups by \code{sample} aesthetic and computes a
 central indicator with \code{central.fun}
 }
 \examples{
 require(data.table)
+require(ggplot2)
 
-dt <- CJ(scenario = 1:3, sample = 1:100, simt = 0:50)
-dt[, simf := 0.5*simt*runif(.N, 0.9, 1.1) + 10*scenario ]
+dt <- CJ(scenario = LETTERS[1:3], sample = 1:100, simt = 0:50)
+dt[, simf := 0.5*simt*runif(.N, 0.9, 1.1) + 10*as.integer(factor(scenario)) ]
 
-ggplot(dt) + aes(simt, log10(simf), color = factor(scenario)) + stat_spaghetti(
+ggplot(dt) + aes(simt, log10(simf), color = scenario) + stat_spaghetti(
  aes(sample = sample)
+) + theme_minimal()
+ggplot(dt) + aes(simt, log10(simf), color = scenario) + stat_spaghetti(
+ aes(sample = sample), central.fun = NULL
 ) + theme_minimal()
 }

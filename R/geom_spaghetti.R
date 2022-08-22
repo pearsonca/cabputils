@@ -1,3 +1,4 @@
+#' @title GGProto object for [stat_spaghetti()]
 #' @export
 StatSpaghetti <- ggplot2::ggproto(
   "StatSpaghetti", ggplot2::Stat,
@@ -10,16 +11,23 @@ StatSpaghetti <- ggplot2::ggproto(
   ) {
     dt <- data |> as.data.table()
     samps <- dt[, .(sample = head(unique(sample), max.lines)), keyby=.(group)]
-    dt |> DT(,
-      copy(.SD)[, c("y", "alpha") := .(central.fun(y), alpha = alpha.central)],
-      by=.(x, group)
-    ) |> rbind(
+    cdt <- dt[0]
+    if (!is.null(central.fun)) {
+      cdt <- dt |> DT(,
+        copy(.SD)[, c("y", "alpha") := .(central.fun(y), alpha = alpha.central)],
+        by=.(x, group)
+      )
+    }
+
+    return(rbind(
+      cdt,
       dt |> DT(
         samps, on=.(sample, group), nomatch=0
       ) |> DT(, c("group", "alpha") := .(
         max(group) + as.integer(interaction(group, sample, drop=TRUE)), alpha.sample
-      ) )
-    )
+      ) ),
+      fill = TRUE
+    ))
   }
 )
 
@@ -28,17 +36,34 @@ StatSpaghetti <- ggplot2::ggproto(
 #' `stat_spaghetti()` extends observation groups by `sample` aesthetic and computes a
 #' central indicator with `central.fun`
 #'
+#' @inheritParams ggplot2::layer
+#' @inheritDotParams ggplot2::layer
+#'
+#' @param max.lines the maximum number of samples to display
+#'
+#' @param alpha.sample the alpha value for sample lines
+#'
+#' @param alpha.central the alpha value for the central indicator
+#'
+#' @param central.fun the function for computing the central indicator
+#'
+#' @param na.rm should `NA` values be removed?
+#'
 #' @importFrom stats median
 #' @importFrom utils tail
 #' @export
 #' @examples
 #' require(data.table)
+#' require(ggplot2)
 #'
-#' dt <- CJ(scenario = 1:3, sample = 1:100, simt = 0:50)
-#' dt[, simf := 0.5*simt*runif(.N, 0.9, 1.1) + 10*scenario ]
+#' dt <- CJ(scenario = LETTERS[1:3], sample = 1:100, simt = 0:50)
+#' dt[, simf := 0.5*simt*runif(.N, 0.9, 1.1) + 10*as.integer(factor(scenario)) ]
 #'
-#' ggplot(dt) + aes(simt, log10(simf), color = factor(scenario)) + stat_spaghetti(
+#' ggplot(dt) + aes(simt, log10(simf), color = scenario) + stat_spaghetti(
 #'  aes(sample = sample)
+#' ) + theme_minimal()
+#' ggplot(dt) + aes(simt, log10(simf), color = scenario) + stat_spaghetti(
+#'  aes(sample = sample), central.fun = NULL
 #' ) + theme_minimal()
 stat_spaghetti <- function(
   mapping = NULL, data = NULL, geom = "line",
