@@ -10,20 +10,18 @@ stat_spaghetti(
   geom = "line",
   position = "identity",
   na.rm = FALSE,
-  show.legend = NA,
+  show.legend = c(alpha = FALSE),
   inherit.aes = TRUE,
   max.lines = if (interactive()) 10 else 100,
-  alpha.sample = 1/max.lines,
-  alpha.central = 1,
   central.fun = median,
   ...
 )
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}} or
-\code{\link[ggplot2:aes_]{aes_()}}. If specified and \code{inherit.aes = TRUE} (the
-default), it is combined with the default mapping at the top level of the
-plot. You must supply \code{mapping} if there is no plot mapping.}
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
 
 \item{data}{The data to be displayed in this layer. There are three
 options:
@@ -40,10 +38,14 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object to use display the data}
+\item{geom}{The geometric object to use to display the data, either as a
+\code{ggproto} \code{Geom} subclass or as a string naming the geom stripped of the
+\code{geom_} prefix (e.g. \code{"point"} rather than \code{"geom_point"})}
 
-\item{position}{Position adjustment, either as a string, or the result of
-a call to a position adjustment function.}
+\item{position}{Position adjustment, either as a string naming the adjustment
+(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
+position adjustment function. Use the latter if you need to change the
+settings of the adjustment.}
 
 \item{na.rm}{should \code{NA} values be removed?}
 
@@ -60,17 +62,15 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{max.lines}{the maximum number of samples to display}
 
-\item{alpha.sample}{the alpha value for sample lines}
-
-\item{alpha.central}{the alpha value for the central indicator}
-
 \item{central.fun}{the function for computing the central indicator}
 
 \item{...}{
   Arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer}}
   \describe{
     \item{\code{stat}}{The statistical transformation to use on the data for this
-layer, as a string.}
+layer, either as a \code{ggproto} \code{Geom} subclass or as a string naming the
+stat stripped of the \code{stat_} prefix (e.g. \code{"count"} rather than
+\code{"stat_count"})}
     \item{\code{params}}{Additional parameters to the \code{geom} and \code{stat}.}
     \item{\code{check.aes,check.param}}{If \code{TRUE}, the default, will check that
 supplied parameters and aesthetics are understood by the \code{geom} or
@@ -80,6 +80,10 @@ function name minus the \code{draw_key_} prefix. See \link[ggplot2]{draw_key} fo
     \item{\code{layer_class}}{The type of layer object to be constructued. This is
 intended for ggplot2 internal use only.}
   }}
+
+\item{alpha}{the alpha value for sample and central lines. N.b. may also be set
+by \code{mapping = aes(alpha = ...)}. May be \code{NULL}, a 1 or 2 valued numeric between
+0 and 1.}
 }
 \description{
 \code{stat_spaghetti()} extends observation groups by \code{sample} aesthetic and computes a
@@ -88,14 +92,20 @@ central indicator with \code{central.fun}
 \examples{
 require(data.table)
 require(ggplot2)
+require(cabputils)
 
 dt <- CJ(scenario = LETTERS[1:3], sample = 1:100, simt = 0:50)
 dt[, simf := 0.5*simt*runif(.N, 0.9, 1.1) + 10*as.integer(factor(scenario)) ]
 
-ggplot(dt) + aes(simt, log10(simf), color = scenario) + stat_spaghetti(
- aes(sample = sample)
-) + theme_minimal()
-ggplot(dt) + aes(simt, log10(simf), color = scenario) + stat_spaghetti(
- aes(sample = sample), central.fun = NULL
-) + theme_minimal()
+core.p <- ggplot(dt) +
+  aes(simt, log10(simf), color = scenario, sample = sample) +
+  theme_minimal()
+# basic behavior
+core.p + stat_spaghetti()
+# only show samples
+core.p + stat_spaghetti(central.fun = NULL)
+# only show central line
+core.p + stat_spaghetti(max.lines = 0)
+# show all the samples
+core.p + stat_spaghetti(max.lines = NA)
 }
