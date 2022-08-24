@@ -5,7 +5,7 @@
 \alias{StatSpaghetti}
 \title{GGProto object for \code{\link[=stat_spaghetti]{stat_spaghetti()}}}
 \format{
-An object of class \code{StatSpaghetti} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatSpaghetti} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 5.
 }
 \usage{
 StatSpaghetti
