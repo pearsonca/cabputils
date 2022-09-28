@@ -8,18 +8,30 @@ store(args, obj, ...)
 }
 \arguments{
 \item{args}{character; where to store \code{obj}. Only
-the last item, i.e. \code{tail(args, 1)}, is used, so
+the last item, i.e. \code{tail(args, 1)}, is used, so e.g.
 all of the script arguments can be tossed in here if
 they end in the file to write to for output.
-Method of storage inferred from file extension.}
+Method of storage inferred from file extension (not
+case-sensitive):
+\itemize{
+\item png, jpg, tif(f), bmp: \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}
+\item rds: \code{\link[=saveRDS]{saveRDS()}}
+\item rda, rdata: \code{\link[=save]{save()}}
+\item csv: \code{\link[data.table:fwrite]{data.table::fwrite()}}
+\item txt: \code{\link[=writeLines]{writeLines()}}
+\item other: Error message
+}}
 
 \item{obj}{the thing to store; CAVEAT EMPTOR: no
 checking to see if \code{obj} is reasonable to store in
-\code{tail(args, 1)}.}
+format inferred from \code{tail(args, 1)}.}
 
-\item{...}{Other arguments to the inferred methods. See:
-\code{\link[=saveRDS]{saveRDS()}} for .rds, \code{\link[=save]{save()}} for .rda, \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}
-for image formats, \code{\link[data.table:fwrite]{data.table::fwrite()}} for csv}
+\item{...}{Other arguments to the inferred methods
+(see \code{args} for relevant methods)}
+}
+\value{
+whatever is returned from the inferred
+storage method.
 }
 \description{
 Provides a generic storage method.

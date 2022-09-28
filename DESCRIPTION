@@ -10,7 +10,7 @@ Authors@R:
   comment = c(ORCID = "0000-0003-0701-7860")
   ))
 Description: Collected convenient extensions, at least
-    convenient relative to CABP idiosyncratic workflow
+    convenient relative to CABP idiosyncratic workflow.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,9 +23,11 @@ Imports:
 Remotes: 
     Rdatatable/data.table
 Suggests: 
+    devtools,
+    usethis,
+    roxygen2,
+    remotes,
     testthat (>= 3.0.0),
 Config/testthat/edition: 3
-    usethis,
-    devtools
-    remotes
 Roxygen: list(markdown = TRUE)
+Config/testthat/parallel: true

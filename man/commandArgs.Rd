@@ -4,14 +4,14 @@
 \alias{commandArgs}
 \title{\code{\link[base:commandArgs]{base::commandArgs()}} with Defaults}
 \usage{
-commandArgs(trailingOnly, args, debugging = interactive())
+commandArgs(trailingOnly = TRUE, args = c(), debugging = interactive())
 }
 \arguments{
 \item{trailingOnly}{see \code{\link[base:commandArgs]{base::commandArgs()}};
-no effect on \code{args}}
+no effect on \code{args}. NB: different default}
 
-\item{args}{character, result to return when
-debugging}
+\item{args}{character vector, result to return
+when \code{debugging == TRUE}}
 
 \item{debugging}{logical, use \code{args} or not}
 }
