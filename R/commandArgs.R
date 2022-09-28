@@ -52,6 +52,11 @@ commandArgs <- function(
 #' @export
 store <- function(args, obj, ...) {
   tarfile <- tail(args, 1)
+  stopifnot(
+    "Must provide a string via args." = class(tarfile) == "character",
+    "Path must have length." = nchar(tarfile) > 0,
+    "Target file must have extension." = nchar(tools::file_ext(tarfile)) > 0
+  )
   fun <- switch(
     tolower(tools::file_ext(tarfile)),
     rds = \(fl, obj, ...) base::saveRDS(obj, file = fl, ...),
