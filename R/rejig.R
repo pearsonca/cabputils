@@ -20,7 +20,7 @@ match.call.defaults <- function(
 
   # for any arguments set in formals & not in the call
   for(nm in setdiff(names(fs), names(mc)))
-    mc[[nm]] <- fs[[nm]] # add those to the call
+    mc[nm] <- fs[nm] # add those to the call
 
   return(mc)
 }
