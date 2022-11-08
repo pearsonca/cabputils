@@ -4,13 +4,19 @@
 \alias{store}
 \title{Generic Storage Wrapper}
 \usage{
-store(args, obj, ...)
+store(obj, args = .args, ...)
 }
 \arguments{
+\item{obj}{the thing to store; CAVEAT EMPTOR: no
+checking to see if \code{obj} is reasonable to store in
+format inferred from \code{tail(args, 1)}.}
+
 \item{args}{character; where to store \code{obj}. Only
-the last item, i.e. \code{tail(args, 1)}, is used, so e.g.
-all of the script arguments can be tossed in here if
-they end in the file to write to for output.
+the last item, i.e. \code{tail(args, 1)}, is used. The default
+assumes script starts with \code{.args <- commandArgs()}, so
+all of the script arguments are tossed in here and the
+last one is assumed to be a target file to write.
+
 Method of storage inferred from file extension (not
 case-sensitive):
 \itemize{
@@ -22,12 +28,8 @@ case-sensitive):
 \item other: Error message
 }}
 
-\item{obj}{the thing to store; CAVEAT EMPTOR: no
-checking to see if \code{obj} is reasonable to store in
-format inferred from \code{tail(args, 1)}.}
-
 \item{...}{Other arguments to the inferred methods
-(see \code{args} for relevant methods)}
+(see \code{args} for relevant methods).}
 }
 \value{
 whatever is returned from the inferred
@@ -35,4 +37,35 @@ storage method.
 }
 \description{
 Provides a generic storage method.
+}
+\details{
+\code{store()} provides a regularized interface to storing data.
+It is intended to conveniently close scripts opened with
+\code{.args <- commandArgs()}, hence the default \code{args = .args}. The default
+can of course be replaced as necessary, and the resulting error refers
+users to this documentation.
+
+The first argument to \code{store()} is the object to be stored; this enables
+piping style code.
+
+Future versions should support pruning \code{...} elements which are
+irrelevant to the inferred storage method before passing on. That will
+facilitate using the same script to e.g. generate csv and rds files
+associated with a dataset. E.g. the following \code{make}-style dependencies
+would be supported:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{some.rds: myscript.R input1.csv input2.csv
+    Rscript $^ $@
+
+some.csv: myscript.R input1.csv input2.csv
+    Rscript $^ $@
+}\if{html}{\out{</div>}}
+
+... or multi-target rules for versions of \code{make} that support such.
+}
+\examples{
+require(cabputils)
+.args <- commandArgs(args = "some.csv") # storing result as a csv
+data.frame(x=1:10, y=10:1) |> store()
+
 }
