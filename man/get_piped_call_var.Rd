@@ -2,9 +2,15 @@
 % Please edit documentation in R/checker.R
 \name{get_piped_call_var}
 \alias{get_piped_call_var}
+\alias{get_piped_call_var_wref}
+\alias{formatmsg}
 \title{Get Initial Variable |>'d into Call Chain}
 \usage{
 get_piped_call_var(sc)
+
+get_piped_call_var_wref(sc)
+
+formatmsg(ls, msg)
 }
 \arguments{
 \item{sc}{the result of a \code{\link[=sys.call]{sys.call()}} within a \code{check_...} function created
