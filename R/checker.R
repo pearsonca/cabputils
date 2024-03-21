@@ -11,19 +11,9 @@
 #' the innermost parenthetical expression ([gsub()])
 #'
 get_piped_call_var <- function(sc) {
-  return(list(
-    sc |> as.character() |> tail(1) |>
-      gsub(".*\\(([^\\(\\)]+)\\).*", "\\1", x = _)
-  ))
-}
-
-#' @rdname get_piped_call_var
-get_piped_call_var_wref <- function(sc) {
-  pipeline <- sc |> as.character() |> tail(2)
-  return(list(
-    pipeline[1] |> gsub(".*\\(([^\\(\\)]+)\\).*", "\\1", x = _),
-    pipeline[2]
-  ))
+  ret <- sc |> as.character() |> tail(-1) |> as.list()
+  ret[[1]] <- gsub(".*\\(([^\\(\\)]+)\\).*", "\\1", ret[[1]])
+  return(ret)
 }
 
 #' @rdname get_piped_call_var
@@ -148,7 +138,7 @@ checker_against <- function(reqexpr, msg) {
   c(alist(x=, ref=), substitute({
     if (missing(ref)) stop("Did not provide a `ref` argument.")
     if (!(reqexpr)) {
-      sys.call() |> get_piped_call_var_wref() |>
+      sys.call() |> get_piped_call_var() |>
         formatmsg(msg) |> stop(call. = FALSE)
     } else invisible(x)
   })) |> as.function()
